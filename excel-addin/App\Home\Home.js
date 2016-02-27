@@ -83,7 +83,6 @@
     
     function addData(point) {
 	Office.context.document.setSelectedDataAsync([[point.x, point.y]]);
-	Office.context.document.goToByIdAsync(Office.Index.Next,Office.GoToType.Index);
     }
 
 })();
