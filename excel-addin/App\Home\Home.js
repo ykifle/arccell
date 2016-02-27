@@ -12,7 +12,8 @@
 			  "dojo/_base/array",
 			  "dojo/domReady!"],
 			  function(drawer, array) {
-					addLayerWithToggle('clickPoints');
+				drawer.addGraphicLayer('clickPoints');
+				addLayerToggle('clickPoints');
 			    drawer.map.on("click", doClick);
 
 			    function doClick(event) {
@@ -21,8 +22,7 @@
 			      insertExcelReverseGeoData(mp);
 			    }
 				
-					function addLayerWithToggle(name) {
-						drawer.addGraphicLayer(name);
+					function addLayerToggle(name) {
 						var toggle = $('<input />', { type: 'checkbox', id: name+'-layer-toggle', value: name })
 								.attr('checked', 'checked');
 						var label = $('<label />', { for: name+'-layer-toggle' }).text(name).append(toggle);
@@ -60,6 +60,11 @@
 							drawer.addPoints(randomPoints, layerName);
 							Office.context.document.setSelectedDataAsync(excelRows);
 						});
+					}
+					
+					function handleClusterClick() {
+						drawer.addClusterLayer("clusterPoints");
+						addLayerToggle("clusterPoints");
 					}
 
 					/******* Excel Sheet Manipulation Methods *******/
@@ -114,8 +119,8 @@
 					}
 
 					$('#show-data-from-selection').click(showDataFromSelection);
-					$('#generate-data').click(showRandomData);
-					$('#cluster').click(function() { drawer.addClusterLayer("clusterPoints") });
+					$('#generate-data').click(function() { showRandomData('clickPoints'); });
+					$('#cluster').click(handleClusterClick);
 			  }
 			);
 		});
