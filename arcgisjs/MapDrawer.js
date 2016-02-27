@@ -40,6 +40,14 @@ define(["esri/map",
       }
     }
 
+    map.on("click", doClick);
+
+    function doClick(event) {
+      var mp = esri.geometry.webMercatorToGeographic(event.mapPoint);
+      addPoints([{long: mp.x, lat: mp.y}]);
+      addData(mp);
+    }
+
     function addPoint(pointData) {
       var mark = new Point(pointData.long, pointData.lat);
       var pointSymbol = new SimpleMarkerSymbol();
