@@ -34,7 +34,7 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
       }
   }
 
-  function addPoint(pointData) {
+  function addPoint(pointData,layerName) {
     var mark;
     layerName = layerName || '_default';
     if (!(layerName in graphicsLayers)) {
