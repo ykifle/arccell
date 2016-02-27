@@ -62,6 +62,10 @@
 						});
 					}
 					
+					function handleBaseClick() {
+						drawer.switchBaseMap()
+					}
+					
 					function handleClusterClick() {
 						if (drawer.addClusterLayer("clusterPoints"))
 						  addLayerToggle("clusterPoints");
@@ -123,7 +127,8 @@
 						return (Math.random() * 360 - 180).toFixed(3) * 1;
 					}
 
-					$('#show-data-from-selection').click(showDataFromSelection);
+					$('#base').click(handleBaseClick);
+					$('#show-data').click(function(){showDataFromSelection('clickPoints')});
 					$('#generate-data').click(function() { showRandomData('clickPoints'); });
 					$('#cluster').click(handleClusterClick);
 					$('#heatmap').click(handleHeatmapClick);

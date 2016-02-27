@@ -13,8 +13,17 @@ Map, Geometry, Point, Polyline, Polygon, Graphic, SimpleMarkerSymbol, SimpleLine
   var allLayers = {};
   var allPoints = [];
   var heatData = [];
+  var baseIdx = 0;
 
   map.on("load", initGraphics);
+  
+  var bases = [
+    "streets" , "satellite", "hybrid" ,"topo", "gray" ,"dark-gray", 
+    "oceans", "national-geographic", "terrain" ,"osm"]
+  function switchBaseMap(){
+    ++baseIdx;
+    map.setBasemap(bases[baseIdx%10])
+  }
 
   function initGraphics() {
     mapLoaded = true;
@@ -175,7 +184,8 @@ Map, Geometry, Point, Polyline, Polygon, Graphic, SimpleMarkerSymbol, SimpleLine
     addClusterLayer: addClusterLayer,
     addHeatmapLayer: addHeatmapLayer,
     hideLayer: hideLayer,
-    showLayer: showLayer
+    showLayer: showLayer,
+    switchBaseMap: switchBaseMap
   };
 
 });
