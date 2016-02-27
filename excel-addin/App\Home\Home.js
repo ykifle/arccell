@@ -68,7 +68,7 @@
     function addData(point) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", 
-		 "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&location="
+		 "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&location="
 		 +point.x+","+point.y,
 		 false);
 	xhr.send();

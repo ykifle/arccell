@@ -48,7 +48,7 @@ define(["esri/map",
       }
     }
 
-    function addPoint(pointData) {
+    function addPoint(pointData, layerName) {
       var mark;
       layerName = layerName || '_default';
       if (!(layerName in graphicsLayers)) {
@@ -63,7 +63,7 @@ define(["esri/map",
         //if it's not a lat/long, do geocoding
         var xhr = new XMLHttpRequest();
         xhr.open("GET", 
-           "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text="
+           "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text="
            +encodeURIComponent(pointData.long),
            false);
         xhr.send();
