@@ -12,14 +12,31 @@
 			  "arccell/MapDrawer",
 			  "dojo/domReady!"],
 			  function(drawer) {
-			    addPoints=drawer.addPoints;
+			    addPoints = drawer.addPoints;
+					addLayerWithToggle('clickPoints');
 			    drawer.map.on("click", doClick);
 
 			    function doClick(event) {
 			      var mp = esri.geometry.webMercatorToGeographic(event.mapPoint);
-			      drawer.addPoints([{long: mp.x, lat: mp.y}]);
+			      drawer.addPoints([{long: mp.x, lat: mp.y}], 'clickPoints');
 			      addData(mp);
 			    }
+				
+					function addLayerWithToggle(name) {
+						drawer.addGraphicLayer(name);
+						var toggle = $('<input />', { type: 'checkbox', id: name+'-layer-toggle', value: name })
+								.attr('checked', 'checked');
+						var label = $('<label />', { for: name+'-layer-toggle' }).text(name).append(toggle);
+						var container = $('#layer-toggles');
+						label.appendTo(container);
+						toggle.change(function() {
+					        if($(this).is(":checked")) {
+								drawer.showLayer(name);
+					        } else {
+								drawer.hideLayer(name);
+							}
+						});
+					}
 			  }
 			);
 			$('#show-data-from-selection').click(showDataFromSelection);

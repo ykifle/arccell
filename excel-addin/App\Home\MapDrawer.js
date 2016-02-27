@@ -9,6 +9,8 @@ define(["esri/map",
         "esri/symbols/SimpleFillSymbol",
         "esri/Color",
         "esri/InfoTemplate",
+        "esri/layers/GraphicsLayer",
+        "esri/renderers/SimpleRenderer",
         "dojo/domReady!",
         "esri/geometry"],
   function (Map,
@@ -21,7 +23,9 @@ define(["esri/map",
             SimpleLineSymbol,
             SimpleFillSymbol,
             Color,
-            InfoTemplate) {
+            InfoTemplate,
+            GraphicsLayer,
+            SimpleRenderer) {
     
     var map = new Map("map", {
         basemap: "topo",
@@ -29,24 +33,33 @@ define(["esri/map",
         zoom: 13
     });
     var mapLoaded = false;
-    var dataCache = [];
+    var dataCache = {
+      '_default': []
+    };
+    var graphicsLayers = {};
     
     map.on("load", initGraphics);
 
     function initGraphics() {
       mapLoaded = true;
-      if (dataCache) {
-        addPoints(dataCache);
+      graphicsLayers['_default'] = map.graphics;
+      for (layerName in dataCache) {
+        addPoints(dataCache[layerName], layerName);
       }
     }
 
-      function addPoint(pointData) {
-          var mark;
-	  if (!isNaN(parseFloat(pointDat.long)) && isFinite(pointDat.long)) {
-              //if it's a number, then interpret as lat/long
+    function addPoint(pointData) {
+      var mark;
+      layerName = layerName || '_default';
+      if (!(layerName in graphicsLayers)) {
+        console.log('No layer with name ' + layerName);
+        return;
+      }
+
+  	  if (!isNaN(parseFloat(pointDat.long)) && isFinite(pointDat.long)) {
+        //if it's a number, then interpret as lat/long
 	      mark = new Point(pointDat.long, pointDat.lat);
-	  }
-	  else {
+  	  } else {
 	      //if it's not a lat/long, do geocoding
 	      var xhr = new XMLHttpRequest();
 	      xhr.open("GET", 
@@ -55,31 +68,57 @@ define(["esri/map",
 		       false);
 	      xhr.send();
 	      if (xhr.status == 200) {
-		  var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
-		  mark = new Point(geom.x, geom.y);
+    		  var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
+    		  mark = new Point(geom.x, geom.y);
 	      } else {
-		  app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
-                  return;
+    		  app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
+          return;
 	      }
+      }
+
       var pointSymbol = new SimpleMarkerSymbol();
       var pointAttributes = { city: "Albuquerque", state: "New Mexico" };
       var pointInfoTemplate = new InfoTemplate("Albuquerque");
       var pointGraphic = new Graphic(mark, pointSymbol, pointAttributes).setInfoTemplate(pointInfoTemplate);
-      map.graphics.add(pointGraphic);
+      graphicsLayers[layerName].add(pointGraphic);
     }
 
-    function addPoints(data) {
+    function addPoints(data, layerName) {
       if (mapLoaded) {
         for (var i=0; i < data.length; i++) {
-          addPoint(data[i]);
+          addPoint(data[i], layerName);
         }
       } else {
-        dataCache = dataCache.concat(data);
+        layerName = layerName || '_default';
+        if (!(layerName in dataCache)) {
+          dataCache[layerName] = [];
+        }
+        dataCache[layerName] = dataCache[layerName].concat(data);
       }
-    };
+    }
+
+    function addGraphicLayer(name) {
+      var layer = new GraphicsLayer();
+      var pointSymbol = new SimpleMarkerSymbol();
+      var renderer = new SimpleRenderer(pointSymbol);
+      layer.setRenderer(renderer);
+      map.addLayer(layer);
+      graphicsLayers[name] = layer;
+    }
+  
+  function hideLayer(name) {
+    graphicsLayers[name].hide();
+  }
+  
+  function showLayer(name) {
+    graphicsLayers[name].show();
+  }
 
     return {
       map: map,
-      addPoints: addPoints
+      addPoints: addPoints,
+      addGraphicLayer: addGraphicLayer,
+      hideLayer: hideLayer,
+      showLayer: showLayer
     };
 });
