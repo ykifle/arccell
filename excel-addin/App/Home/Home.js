@@ -10,7 +10,9 @@
 		$(document).ready(function() {
 			app.initialize();
 			require(
-			["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geometry/Polyline", "esri/geometry/Polygon", "esri/graphic", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/Color", "esri/InfoTemplate", "dojo/domReady!", "esri/geometry"], function(Map, Geometry, Point, Polyline, Polygon, Graphic, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color, InfoTemplate) {
+				["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geometry/Polyline",
+				 "esri/geometry/Polygon", "esri/graphic", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/Color", "esri/InfoTemplate", "dojo/domReady!", "esri/geometry"], 
+			function(Map, Geometry, Point, Polyline, Polygon, Graphic, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color, InfoTemplate) {
 				map = new Map("map", {
 					basemap: "topo",
 					center: [-106.61, 35.1107],
@@ -20,22 +22,12 @@
 				var dataCache = [];
 
 				map.on("load", addSomeGraphics);
-				map.on("click", doClick);
 
 				function addSomeGraphics() {
 					mapLoaded = true;
 					if (dataCache) {
 						addPoints(dataCache);
 					}
-				}
-
-				function doClick(event) {
-					var mp = esri.geometry.webMercatorToGeographic(event.mapPoint);
-					addPoints([{
-						long: mp.x,
-						lat: mp.y
-					}]);
-					addData(mp);
 				}
 
 				addPoints = function(data) {
@@ -60,7 +52,6 @@
 
 			});
 			$('#show-data-from-selection').click(showDataFromSelection);
-			$('#generate-data').click(generateData);
 		});
 	};
 
@@ -69,17 +60,11 @@
 		if (Office.context.document.getSelectedDataAsync) {
 			Office.context.document.getSelectedDataAsync(Office.CoercionType.Matrix, function(result) {
 				if (result.status === Office.AsyncResultStatus.Succeeded) {
-					addPoints([{
-						long: -106.61,
-						lat: 35.1107
-					}]);
-					for (var idx = 0; idx < result.value.length; ++idx) {
-						addPoints([{
-							long: result.value[idx][0],
-							lat: result.value[idx][1]
-						}]);
+					addPoints([{long: -106.61,lat: 35.1107}]);
+					for (var idx=0;idx<result.value.length;++idx) {
+					  addPoints([{long: result.value[idx][0],lat: result.value[idx][1]}]);
 					}
-					app.showNotification('Drawn on ESRI map', result.value.length + " points");
+					app.showNotification('Drawn on ESRI map', result.value.length+" points");
 				} else {
 					app.showNotification('Error:', result.error.message);
 				}
@@ -89,30 +74,4 @@
 		}
 	}
 
-	function randomGeo() {
-		return (Math.random() * 360 - 180).toFixed(3) * 1;
-	}
-
-
-	function generateData() {
-		var randomData = []
-		var ps = []
-		for (var i = 0; i < 20; ++i) {
-			var p = {
-				long: randomGeo(),
-				lat: randomGeo()
-			}
-			randomData.push([p.long, p.lat]);
-			ps.push(p);
-		}
-		addPoints(ps);
-		Office.context.document.setSelectedDataAsync(randomData);
-	}
-
-
-	function addData(point) {
-		Office.context.document.setSelectedDataAsync([
-			[point.x, point.y]
-		]);
-	}
 })();
