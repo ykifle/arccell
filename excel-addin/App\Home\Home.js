@@ -22,6 +22,7 @@
 				var dataCache = [];
 
 				map.on("load", addSomeGraphics);
+				map.on("click", doClick);
 
 				function addSomeGraphics() {
 					mapLoaded = true;
@@ -29,6 +30,12 @@
 						addPoints(dataCache);
 					}
 				}
+			    
+			    function doClick(event) {
+				var mp = esri.geometry.webMercatorToGeographic(event.mapPoint);
+				addPoints([{long: mp.x, lat: mp.y}]);
+				addData(mp);
+			    }
 
 				addPoints = function(data) {
 					if (mapLoaded) {
@@ -73,5 +80,10 @@
 			app.showNotification('Error:', 'Reading selection data is not supported by this host application.');
 		}
 	}
+    
+    function addData(point) {
+	Office.context.document.setSelectedDataAsync([[point.x, point.y]]);
+	Office.context.document.goToByIdAsync(Office.Index.Next,Office.GoToType.Index);
+    }
 
 })();
