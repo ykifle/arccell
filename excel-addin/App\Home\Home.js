@@ -114,7 +114,7 @@
 					}
 
 					$('#show-data-from-selection').click(showDataFromSelection);
-					$('#generate-data').click(showRandomData);
+					$('#generate-data').click(function() { showRandomData()});
 					$('#cluster').click(function() { drawer.addClusterLayer("clusterPoints") });
 			  }
 			);
