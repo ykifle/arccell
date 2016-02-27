@@ -1,16 +1,5 @@
-define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geometry/Polyline", 
-"esri/geometry/Polygon", "esri/graphic", "esri/symbols/SimpleMarkerSymbol", 
-"esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/Color", 
-"esri/InfoTemplate", "esri/layers/GraphicsLayer", "esri/renderers/SimpleRenderer", 
-"arccell/ClusterLayer","esri/symbols/PictureMarkerSymbol","esri/renderers/ClassBreaksRenderer",
-"esri/geometry/webMercatorUtils",
-"dojo/domReady!", "esri/geometry"], function(
-  Map, Geometry, Point, Polyline, 
-  Polygon, Graphic, SimpleMarkerSymbol, 
-  SimpleLineSymbol, SimpleFillSymbol, Color, 
-  InfoTemplate, GraphicsLayer, SimpleRenderer,
-  ClusterLayer,PictureMarkerSymbol,ClassBreaksRenderer,
-  webMercatorUtils) {
+define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geometry/Polyline", "esri/geometry/Polygon", "esri/graphic", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/Color", "esri/InfoTemplate", "esri/layers/GraphicsLayer", "esri/renderers/SimpleRenderer", "arccell/ClusterLayer", "arccell/HeatmapLayer", "esri/symbols/PictureMarkerSymbol", "esri/renderers/ClassBreaksRenderer", "esri/geometry/webMercatorUtils", "arccell/Heatmap", "dojo/domReady!", "esri/geometry"], function(
+Map, Geometry, Point, Polyline, Polygon, Graphic, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color, InfoTemplate, GraphicsLayer, SimpleRenderer, ClusterLayer, HeatmapLayer, PictureMarkerSymbol, ClassBreaksRenderer, webMercatorUtils) {
 
   var map = new Map("map", {
     basemap: "topo",
@@ -21,23 +10,24 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
   var dataCache = {
     '_default': []
   };
-  var graphicsLayers = {};
+  var allLayers = {};
   var allPoints = [];
+  var heatData = [];
 
   map.on("load", initGraphics);
 
   function initGraphics() {
-      mapLoaded = true;
-      graphicsLayers['_default'] = map.graphics;
-      for (var layerName in dataCache) {
-        addPoints(dataCache[layerName], layerName);
-      }
+    mapLoaded = true;
+    allLayers['_default'] = map.graphics;
+    for (var layerName in dataCache) {
+      addPoints(dataCache[layerName], layerName);
+    }
   }
 
   function addPoint(pointData, layerName) {
     var mark;
     layerName = layerName || '_default';
-    if (!(layerName in graphicsLayers)) {
+    if (!(layerName in allLayers)) {
       console.log('No layer with name ' + layerName);
       return;
     }
@@ -46,24 +36,32 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
       //if it's a number, then interpret as lat/long
       mark = new Point(pointData.long, pointData.lat);
     } else {
-        //if it's not a lat/long, do geocoding
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", 
-           "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text="
-           +encodeURIComponent(pointData.long),
-           false);
-        xhr.send();
-        if (xhr.status == 200) {
-          var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
-          mark = new Point(geom.x, geom.y);
-        } else {
-          app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
-          return;
-        }
+      //if it's not a lat/long, do geocoding
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text=" + encodeURIComponent(pointData.long), false);
+      xhr.send();
+      if (xhr.status == 200) {
+        var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
+        mark = new Point(geom.x, geom.y);
+      } else {
+        app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
+        return;
       }
-    
+    }
+
     var webMercator = webMercatorUtils.geographicToWebMercator(mark);
     allPoints.push(webMercator);
+    heatData.push({
+      'attributes': {},
+      'geometry': {
+        spatialReference: {
+          wkid: 102100
+        },
+        type: "point",
+        x: webMercator.x,
+        y: webMercator.y
+      }
+    })
     var pointSymbol = new SimpleMarkerSymbol();
     var pointAttributes = {
       city: "Albuquerque",
@@ -71,7 +69,7 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
     };
     var pointInfoTemplate = new InfoTemplate("Albuquerque");
     var pointGraphic = new Graphic(mark, pointSymbol, pointAttributes).setInfoTemplate(pointInfoTemplate);
-    graphicsLayers[layerName].add(pointGraphic);
+    allLayers[layerName].add(pointGraphic);
   }
 
   function addPoints(data, layerName) {
@@ -94,10 +92,15 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
     var renderer = new SimpleRenderer(pointSymbol);
     layer.setRenderer(renderer);
     map.addLayer(layer);
-    graphicsLayers[name] = layer;
+    allLayers[name] = layer;
   }
 
   function addClusterLayer(name) {
+    var add = true
+    if (name in allLayers) {
+      add = false
+      map.removeLayer(allLayers[name])
+    }
     var layer = new ClusterLayer({
       "data": allPoints,
       "distance": 100,
@@ -105,9 +108,9 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
       "labelColor": "#fff",
       "labelOffset": 10,
       "resolution": map.extent.getWidth() / map.width,
-            "showSingles": true,
+      "showSingles": true,
       "singleColor": "#888",
-      "maxSingles":10
+      "maxSingles": 10
     });
     var pointSymbol = new SimpleMarkerSymbol().setSize(4);
     var renderer = new ClassBreaksRenderer(pointSymbol, "clusterCount");
@@ -120,15 +123,48 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
     renderer.addBreak(5, 1001, red);
     layer.setRenderer(renderer);
     map.addLayer(layer);
-    graphicsLayers[name] = layer;
-    }
+    allLayers[name] = layer;
+    return add;
+  }
 
-    function hideLayer(name) {
-      graphicsLayers[name].hide();
+  function addHeatmapLayer(name) {
+    if (!(name in allLayers)) {
+      layer = new HeatmapLayer({
+        config: {
+          "useLocalMaximum": true,
+          "radius": 40,
+          "gradient": {
+            0.25: "rgb(000,000,255)",
+            0.45: "rgb(000,255,255)",
+            0.65: "rgb(000,255,000)",
+            0.85: "rgb(255,255,000)",
+            1.00: "rgb(255,000,000)"
+          }
+        },
+        "map": map,
+        "domNodeId": "heatLayer",
+        "opacity": 0.8
+      });
+      layer.setData(heatData);
+      map.addLayer(layer);
+      allLayers[name] = layer;
+      return true;
+    } else {
+      refreshHeatmapLayer(name);
+      return false;
+    }
+  }
+
+  function refreshHeatmapLayer(name) {
+    allLayers[name].setData(heatData);
+  }
+
+  function hideLayer(name) {
+    allLayers[name].hide();
   }
 
   function showLayer(name) {
-    graphicsLayers[name].show();
+    allLayers[name].show();
   }
 
   return {
@@ -137,6 +173,7 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
     addPoints: addPoints,
     addGraphicLayer: addGraphicLayer,
     addClusterLayer: addClusterLayer,
+    addHeatmapLayer: addHeatmapLayer,
     hideLayer: hideLayer,
     showLayer: showLayer
   };

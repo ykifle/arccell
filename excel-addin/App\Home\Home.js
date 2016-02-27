@@ -63,8 +63,13 @@
 					}
 					
 					function handleClusterClick() {
-						drawer.addClusterLayer("clusterPoints");
-						addLayerToggle("clusterPoints");
+						if (drawer.addClusterLayer("clusterPoints"))
+						  addLayerToggle("clusterPoints");
+					}
+					
+					function handleHeatmapClick() {
+						if (drawer.addHeatmapLayer("heatmapPoints"))
+						  addLayerToggle("heatmapPoints");
 					}
 
 					/******* Excel Sheet Manipulation Methods *******/
@@ -121,6 +126,7 @@
 					$('#show-data-from-selection').click(showDataFromSelection);
 					$('#generate-data').click(function() { showRandomData('clickPoints'); });
 					$('#cluster').click(handleClusterClick);
+					$('#heatmap').click(handleHeatmapClick);
 			  }
 			);
 		});
