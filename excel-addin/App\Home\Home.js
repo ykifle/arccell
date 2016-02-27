@@ -11,7 +11,13 @@
 			  "arccell/MapDrawer",
 			  "dojo/domReady!"],
 			  function(drawer) {
-			    drawer.addPoints([{ long: -106.61, lat: 35.1107 }]);
+			    drawer.map.on("click", doClick);
+
+			    function doClick(event) {
+			      var mp = esri.geometry.webMercatorToGeographic(event.mapPoint);
+			      drawer.addPoints([{long: mp.x, lat: mp.y}]);
+			      addData(mp);
+			    }
 			  }
 			);
 			$('#show-data-from-selection').click(showDataFromSelection);
