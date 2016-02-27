@@ -22,6 +22,7 @@ define(["esri/map",
             SimpleFillSymbol,
             Color,
             InfoTemplate) {
+    
     var map = new Map("map", {
         basemap: "topo",
         center: [-106.61, 35.1107],
