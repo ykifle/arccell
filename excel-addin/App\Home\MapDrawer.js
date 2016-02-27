@@ -46,18 +46,22 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
       //if it's a number, then interpret as lat/long
       mark = new Point(pointData.long, pointData.lat);
     } else {
-      //if it's not a lat/long, do geocoding
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text=" + encodeURIComponent(pointData.long), false);
-      xhr.send();
-      if (xhr.status == 200) {
-        var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
-        mark = new Point(geom.x, geom.y);
-      } else {
-        app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
-        return;
+        //if it's not a lat/long, do geocoding
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", 
+           "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text="
+           +encodeURIComponent(pointData.long),
+           false);
+        xhr.send();
+        if (xhr.status == 200) {
+          var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
+          mark = new Point(geom.x, geom.y);
+        } else {
+          app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
+          return;
+        }
       }
-    }
+    
     var webMercator = webMercatorUtils.geographicToWebMercator(mark);
     allPoints.push(webMercator);
     var pointSymbol = new SimpleMarkerSymbol();
