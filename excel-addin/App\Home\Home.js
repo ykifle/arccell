@@ -2,7 +2,6 @@
 // global app
 (function() {
 	'use strict';
-	var addPoints;
 
 	// The initialize function must be run each time a new page is loaded
 	Office.initialize = function(reason) {
@@ -10,16 +9,16 @@
 			app.initialize();
 			require([
 			  "arccell/MapDrawer",
+			  "dojo/_base/array",
 			  "dojo/domReady!"],
-			  function(drawer) {
-			    addPoints = drawer.addPoints;
-				addLayerWithToggle('clickPoints');
+			  function(drawer, array) {
+					addLayerWithToggle('clickPoints');
 			    drawer.map.on("click", doClick);
 
 			    function doClick(event) {
 			      var mp = esri.geometry.webMercatorToGeographic(event.mapPoint);
-			      drawer.addPoints([{long: mp.x, lat: mp.y}], 'clickPoints');
-			      addData(mp);
+			      drawer.addPoint({long: mp.x, lat: mp.y}, 'clickPoints');
+			      insertExcelReverseGeoData(mp);
 			    }
 				
 					function addLayerWithToggle(name) {
@@ -37,65 +36,88 @@
 							}
 						});
 					}
+
+					// Reads data from current document selection and displays a notification
+					function showDataFromSelection(layerName) {
+						getDataFromSelection(function(result) {
+							var points = [];
+							for (var idx = 0; idx < result.value.length; ++idx) {
+								points.push({
+									long: result.value[idx][0],
+									lat: result.value[idx][1]
+								});
+								drawer.addPoints(points, layerName);
+							}
+						});
+					}
+
+					function showRandomData(layerName) {
+						getSelectedRowsCount(function(count) {
+							var randomPoints = generateRandomGeoList(count);
+							var excelRows = array.map(randomPoints, function(p) {
+								return [p.long, p.lat];
+							});
+							drawer.addPoints(randomPoints, layerName);
+							Office.context.document.setSelectedDataAsync(excelRows);
+						});
+					}
+
+					/******* Excel Sheet Manipulation Methods *******/
+
+					function getDataFromSelection(callback) {
+						if (Office.context.document.getSelectedDataAsync) {
+							Office.context.document.getSelectedDataAsync(Office.CoercionType.Matrix, function(result) {
+								if (result.status === Office.AsyncResultStatus.Succeeded) {
+									if (callback) {
+										callback(result);
+									}
+									app.showNotification('Drawn on ESRI map', result.value.length + " points");
+								} else {
+									app.showNotification('Error:', result.error.message);
+								}
+							});
+						} else {
+							app.showNotification('Error:', 'Reading selection data is not supported by this host application.');
+						}
+					}
+
+					function getSelectedRowsCount(callback) {
+						getDataFromSelection(function(result) {
+							callback(result.value.length);
+						});
+					}
+
+				  function insertExcelReverseGeoData(point) {
+				  	$.get("https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&location=" +
+				  		point.x + "," + point.y, function(data) {
+				  			var addr = JSON.parse(data).address.Match_addr;
+				  			Office.context.document.setSelectedDataAsync([[point.x, point.y, addr]]);
+						});
+				  }
+
+				  /******* Helpers *******/
+
+				  function generateRandomGeoList(count) {
+						var randomData = [];
+						// var ps = []
+						for (var i = 0; i < count; ++i) {
+							randomData.push({
+								long: randomGeo(),
+								lat: randomGeo()
+							});
+						}
+						return randomData;
+					}
+
+					function randomGeo() {
+						return (Math.random() * 360 - 180).toFixed(3) * 1;
+					}
+
+					$('#show-data-from-selection').click(showDataFromSelection);
+					$('#generate-data').click(showRandomData);
+
 			  }
 			);
-			$('#show-data-from-selection').click(showDataFromSelection);
-			$('#generate-data').click(generateData);
 		});
 	};
-
-	// Reads data from current document selection and displays a notification
-	function showDataFromSelection() {
-		if (Office.context.document.getSelectedDataAsync) {
-			Office.context.document.getSelectedDataAsync(Office.CoercionType.Matrix, function(result) {
-				if (result.status === Office.AsyncResultStatus.Succeeded) {
-					for (var idx = 0; idx < result.value.length; ++idx) {
-						addPoints([{
-							long: result.value[idx][0],
-							lat: result.value[idx][1]
-						}]);
-					}
-					app.showNotification('Drawn on ESRI map', result.value.length + " points");
-				} else {
-					app.showNotification('Error:', result.error.message);
-				}
-			});
-		} else {
-			app.showNotification('Error:', 'Reading selection data is not supported by this host application.');
-		}
-	}
-    
-    function addData(point) {
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", 
-		 "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&location="
-		 +point.x+","+point.y,
-		 false);
-	xhr.send();
-	var addr = "";
-	if (xhr.status == 200) {
-	    addr = JSON.parse(xhr.response).address.Match_addr;
-	}
-	Office.context.document.setSelectedDataAsync([[point.x, point.y, addr]]);
-    }
-
-	function randomGeo() {
-		return (Math.random() * 360 - 180).toFixed(3) * 1;
-	}
-
-
-	function generateData() {
-		var randomData = []
-		var ps = []
-		for (var i = 0; i < 20; ++i) {
-			var p = {
-				long: randomGeo(),
-				lat: randomGeo()
-			}
-			randomData.push([p.long, p.lat]);
-			ps.push(p);
-		}
-		addPoints(ps);
-		Office.context.document.setSelectedDataAsync(randomData);
-	}
 })();

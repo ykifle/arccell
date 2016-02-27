@@ -43,7 +43,7 @@ define(["esri/map",
     function initGraphics() {
       mapLoaded = true;
       graphicsLayers['_default'] = map.graphics;
-      for (layerName in dataCache) {
+      for (var layerName in dataCache) {
         addPoints(dataCache[layerName], layerName);
       }
     }
@@ -58,7 +58,7 @@ define(["esri/map",
 
       if (!isNaN(parseFloat(pointData.long)) && isFinite(pointData.long)) {
         //if it's a number, then interpret as lat/long
-      mark = new Point(pointData.long, pointData.lat);
+        mark = new Point(pointData.long, pointData.lat);
       } else {
         //if it's not a lat/long, do geocoding
         var xhr = new XMLHttpRequest();
@@ -106,17 +106,18 @@ define(["esri/map",
       graphicsLayers[name] = layer;
     }
   
-  function hideLayer(name) {
-    graphicsLayers[name].hide();
-  }
-  
-  function showLayer(name) {
-    graphicsLayers[name].show();
-  }
+    function hideLayer(name) {
+      graphicsLayers[name].hide();
+    }
+    
+    function showLayer(name) {
+      graphicsLayers[name].show();
+    }
 
     return {
       map: map,
       addPoints: addPoints,
+      addPoint: addPoint,
       addGraphicLayer: addGraphicLayer,
       hideLayer: hideLayer,
       showLayer: showLayer
