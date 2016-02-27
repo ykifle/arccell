@@ -2,63 +2,26 @@
 // global app
 (function() {
 	'use strict';
-	var map;
 	var addPoints;
 
 	// The initialize function must be run each time a new page is loaded
 	Office.initialize = function(reason) {
 		$(document).ready(function() {
 			app.initialize();
-			require(
-			["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geometry/Polyline", "esri/geometry/Polygon", "esri/graphic", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/Color", "esri/InfoTemplate", "dojo/domReady!", "esri/geometry"], function(Map, Geometry, Point, Polyline, Polygon, Graphic, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color, InfoTemplate) {
-				map = new Map("map", {
-					basemap: "topo",
-					center: [-106.61, 35.1107],
-					zoom: 13
-				});
-				var mapLoaded = false;
-				var dataCache = [];
+			require([
+			  "arccell/MapDrawer",
+			  "dojo/domReady!"],
+			  function(drawer) {
+			    addPoints=drawer.addPoints;
+			    drawer.map.on("click", doClick);
 
-				map.on("load", addSomeGraphics);
-				map.on("click", doClick);
-
-				function addSomeGraphics() {
-					mapLoaded = true;
-					if (dataCache) {
-						addPoints(dataCache);
-					}
-				}
-
-				function doClick(event) {
-					var mp = esri.geometry.webMercatorToGeographic(event.mapPoint);
-					addPoints([{
-						long: mp.x,
-						lat: mp.y
-					}]);
-					addData(mp);
-				}
-
-				addPoints = function(data) {
-					if (mapLoaded) {
-						for (var i = 0; i < data.length; i++) {
-							var pointDat = data[i];
-							var mark = new Point(pointDat.long, pointDat.lat);
-							var pointSymbol = new SimpleMarkerSymbol();
-							var pointAttributes = {
-								city: "Albuquerque",
-								state: "New Mexico"
-							};
-							var pointInfoTemplate = new InfoTemplate("Albuquerque");
-							var pointGraphic = new Graphic(mark, pointSymbol, pointAttributes).setInfoTemplate(pointInfoTemplate);
-							map.graphics.add(pointGraphic);
-						}
-					} else {
-						dataCache = dataCache.concat(data);
-					}
-				};
-
-
-			});
+			    function doClick(event) {
+			      var mp = esri.geometry.webMercatorToGeographic(event.mapPoint);
+			      drawer.addPoints([{long: mp.x, lat: mp.y}]);
+			      addData(mp);
+			    }
+			  }
+			);
 			$('#show-data-from-selection').click(showDataFromSelection);
 			$('#generate-data').click(generateData);
 		});
@@ -88,6 +51,20 @@
 			app.showNotification('Error:', 'Reading selection data is not supported by this host application.');
 		}
 	}
+    
+    function addData(point) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", 
+		 "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&location="
+		 +point.x+","+point.y,
+		 false);
+	xhr.send();
+	var addr = "";
+	if (xhr.status == 200) {
+	    addr = JSON.parse(xhr.response).address.Match_addr;
+	}
+	Office.context.document.setSelectedDataAsync([[point.x, point.y, addr]]);
+    }
 
 	function randomGeo() {
 		return (Math.random() * 360 - 180).toFixed(3) * 1;
@@ -107,12 +84,5 @@
 		}
 		addPoints(ps);
 		Office.context.document.setSelectedDataAsync(randomData);
-	}
-
-
-	function addData(point) {
-		Office.context.document.setSelectedDataAsync([
-			[point.x, point.y]
-		]);
 	}
 })();
