@@ -27,11 +27,11 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
   map.on("load", initGraphics);
 
   function initGraphics() {
-    mapLoaded = true;
-    graphicsLayers['_default'] = map.graphics;
-    for (layerName in dataCache) {
-      addPoints(dataCache[layerName], layerName);
-    }
+      mapLoaded = true;
+      graphicsLayers['_default'] = map.graphics;
+      for (var layerName in dataCache) {
+        addPoints(dataCache[layerName], layerName);
+      }
   }
 
   function addPoint(pointData) {
@@ -133,10 +133,12 @@ define(["esri/map", "esri/geometry/Geometry", "esri/geometry/Point", "esri/geome
 
   return {
     map: map,
+    addPoint: addPoint,
     addPoints: addPoints,
     addGraphicLayer: addGraphicLayer,
     addClusterLayer: addClusterLayer,
     hideLayer: hideLayer,
     showLayer: showLayer
   };
+
 });
