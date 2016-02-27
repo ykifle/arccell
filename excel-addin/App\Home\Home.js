@@ -13,7 +13,7 @@
 			  "dojo/domReady!"],
 			  function(drawer) {
 			    addPoints = drawer.addPoints;
-					addLayerWithToggle('clickPoints');
+				addLayerWithToggle('clickPoints');
 			    drawer.map.on("click", doClick);
 
 			    function doClick(event) {
