@@ -36,11 +36,29 @@
 								drawer.hideLayer(name);
 							}
 						});
-					}
-			  }
-			);
-			$('#show-data-from-selection').click(showDataFromSelection);
-			$('#generate-data').click(generateData);
+						}
+
+						function generateData() {
+							var randomData = []
+							var ps = []
+							for (var i = 0; i < 20; ++i) {
+								var p = {
+									long: randomGeo(),
+									lat: randomGeo()
+								}
+								randomData.push([p.long, p.lat]);
+								ps.push(p);
+							}
+							drawer.addPoints(ps);
+							Office.context.document.setSelectedDataAsync(randomData);
+						}
+						
+						$('#cluster').click(function() {
+							drawer.addClusterLayer("clusterPoints")
+						});
+						$('#show-data-from-selection').click(showDataFromSelection);
+						$('#generate-data').click(generateData);
+						});
 		});
 	};
 
@@ -68,7 +86,7 @@
     function addData(point) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", 
-		 "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&location="
+		 "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&location="
 		 +point.x+","+point.y,
 		 false);
 	xhr.send();
@@ -83,19 +101,4 @@
 		return (Math.random() * 360 - 180).toFixed(3) * 1;
 	}
 
-
-	function generateData() {
-		var randomData = []
-		var ps = []
-		for (var i = 0; i < 20; ++i) {
-			var p = {
-				long: randomGeo(),
-				lat: randomGeo()
-			}
-			randomData.push([p.long, p.lat]);
-			ps.push(p);
-		}
-		addPoints(ps);
-		Office.context.document.setSelectedDataAsync(randomData);
-	}
 })();
