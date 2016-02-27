@@ -38,7 +38,17 @@
 	}
     
     function addData(point) {
-		Office.context.document.setSelectedDataAsync([[point.x, point.y]]);
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", 
+		 "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&location="
+		 +point.x+","+point.y,
+		 false);
+	xhr.send();
+	var addr = "";
+	if (xhr.status == 200) {
+	    addr = JSON.parse(xhr.response).address.Match_addr;
+	}
+	Office.context.document.setSelectedDataAsync([[point.x, point.y, addr]]);
     }
 
 })();
