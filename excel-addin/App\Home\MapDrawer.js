@@ -40,8 +40,27 @@ define(["esri/map",
       }
     }
 
-    function addPoint(pointData) {
-      var mark = new Point(pointData.long, pointData.lat);
+      function addPoint(pointData) {
+          var mark;
+	  if (!isNaN(parseFloat(pointDat.long)) && isFinite(pointDat.long)) {
+              //if it's a number, then interpret as lat/long
+	      mark = new Point(pointDat.long, pointDat.lat);
+	  }
+	  else {
+	      //if it's not a lat/long, do geocoding
+	      var xhr = new XMLHttpRequest();
+	      xhr.open("GET", 
+		       "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text="
+		       +encodeURIComponent(pointDat.long),
+		       false);
+	      xhr.send();
+	      if (xhr.status == 200) {
+		  var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
+		  mark = new Point(geom.x, geom.y);
+	      } else {
+		  app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
+                  return;
+	      }
       var pointSymbol = new SimpleMarkerSymbol();
       var pointAttributes = { city: "Albuquerque", state: "New Mexico" };
       var pointInfoTemplate = new InfoTemplate("Albuquerque");

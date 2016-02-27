@@ -32,10 +32,6 @@
 		if (Office.context.document.getSelectedDataAsync) {
 			Office.context.document.getSelectedDataAsync(Office.CoercionType.Matrix, function(result) {
 				if (result.status === Office.AsyncResultStatus.Succeeded) {
-					addPoints([{
-						long: -106.61,
-						lat: 35.1107
-					}]);
 					for (var idx = 0; idx < result.value.length; ++idx) {
 						addPoints([{
 							long: result.value[idx][0],
