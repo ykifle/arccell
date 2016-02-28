@@ -165,15 +165,15 @@
 					// var ps = []
 					for (var i = 0; i < count; ++i) {
 						randomData.push({
-							long: randomGeo(),
-							lat: randomGeo()
+							long: randomGeo()-95,
+							lat: randomGeo()+37
 						});
 					}
 					return randomData;
 				}
 
 				function randomGeo() {
-					return (Math.random() * 360 - 180).toFixed(3) * 1;
+					return (Math.random() * 40-20).toFixed(3) * 1;
 				}
 
 					$('#base').click(handleBaseClick);

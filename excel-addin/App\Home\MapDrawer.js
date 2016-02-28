@@ -82,8 +82,9 @@ define(["esri/map",
       mark = new Point(pointData.long, pointData.lat);
     } else {
       //if it's not a lat/long, do geocoding
+    var addr = pointData.long.split('\n').slice(0,2).join()
       var xhr = new XMLHttpRequest();
-      xhr.open("GET", "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text=" + encodeURIComponent(pointData.long), false);
+      xhr.open("GET", "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text=" + encodeURIComponent(addr), false);
       xhr.send();
       if (xhr.status == 200) {
         var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
