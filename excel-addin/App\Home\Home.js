@@ -7,10 +7,12 @@
 	Office.initialize = function(reason) {
 		$(document).ready(function() {
 			app.initialize();
-			require(["arccell/MapDrawer", "arccell/ArcGisApi", "esri/dijit/geoenrichment/DataBrowser", "dojo/_base/array", "dijit/popup", "dojo/domReady!"], 
-			function(drawer, arcApi, DataBrowser, array, popup) {
+			require(["arccell/BarChart", "arccell/MapDrawer", "arccell/ArcGisApi", "esri/dijit/geoenrichment/DataBrowser", "dojo/_base/array", "dojo/domReady!"], function(chart, drawer, arcApi, DataBrowser, array) {
 				drawer.addGraphicLayer('clickPoints');
 				addLayerToggle('clickPoints');
+				drawer.addGraphicLayer('chartPoints');
+				addLayerToggle('chartPoints');
+				
 				drawer.map.on("click", doClick);
 
 				function doClick(event) {
@@ -81,8 +83,8 @@
 								long: result.value[idx][0],
 								lat: result.value[idx][1]
 							});
-							drawer.addPoints(points, layerName);
 						}
+						drawer.addPoints(points, layerName);
 					});
 				}
 
@@ -186,7 +188,10 @@
 						});
 					});
 				}
-
+				function handleClearClick() {
+					drawer.clearLayers();
+				}
+				
 				/******* Excel Sheet Manipulation Methods *******/
 
 				function getDataFromSelection(coercionType, callback) {
@@ -210,6 +215,26 @@
 					}
 				}
 
+                                  function plotData() {
+									 getDataFromSelection(function(result) {
+										if (result.value[0].length == 2) {
+											var gc = result.value.map(
+												function(d) {
+													var p = arcApi.geocode(d[0]);
+													return [p.x, p.y, d[1]];
+												});
+											var data = chart.count(gc);
+											chart.chart(data);
+										} else if (result.value[0].length == 3) {
+											var data = chart.count(result.value);
+											chart.chart(data);
+										} else {
+											app.showNotification('Error:', 'Select 2 or 3 columns to chart.');
+										}
+									 });
+                                  }
+
+				  /******* Helpers *******/
 				function getSelectedRowsCount(callback) {
 					getDataFromSelection(function(result) {
 						callback(result.value.length);
@@ -247,15 +272,15 @@
 					// var ps = []
 					for (var i = 0; i < count; ++i) {
 						randomData.push({
-							long: randomGeo(),
-							lat: randomGeo()
+							long: randomGeo()-95,
+							lat: randomGeo()+37
 						});
 					}
 					return randomData;
 				}
 
 				function randomGeo() {
-					return (Math.random() * 360 - 180).toFixed(3) * 1;
+					return (Math.random() * 40-20).toFixed(3) * 1;
 				}
 
 				$('#base').click(handleBaseClick);
@@ -269,6 +294,8 @@
 				$('#heatmap').click(handleHeatmapClick);
 				$('#enrich').click(handleGeoEnrichClick);
 				$('#highlight-selection').change(handleHightlightSelectionChange);
+				$('#make-chart').click(plotData);
+				$('#clear').click(handleClearClick);
 			});
 		});
 	};

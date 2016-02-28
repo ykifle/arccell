@@ -16,6 +16,7 @@ define(["esri/map",
         "esri/symbols/PictureMarkerSymbol",
         "esri/renderers/ClassBreaksRenderer",
         "esri/geometry/webMercatorUtils",
+        "arccell/ArcGisApi",
         "arccell/Heatmap",
         "dojo/domReady!",
         "esri/geometry"], function(Map,
@@ -35,7 +36,8 @@ define(["esri/map",
                                    HeatmapLayer,
                                    PictureMarkerSymbol,
                                    ClassBreaksRenderer,
-                                   webMercatorUtils) {
+                                   webMercatorUtils,
+                                   arcApi) {
 
   var map = new Map("map", {
     basemap: "topo",
@@ -82,16 +84,7 @@ define(["esri/map",
       mark = new Point(pointData.long, pointData.lat);
     } else {
       //if it's not a lat/long, do geocoding
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text=" + encodeURIComponent(pointData.long), false);
-      xhr.send();
-      if (xhr.status == 200) {
-        var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
-        mark = new Point(geom.x, geom.y);
-      } else {
-        app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
-        return;
-      }
+      mark = arcApi.geocode(pointData.long);
     }
 
     var webMercator = webMercatorUtils.geographicToWebMercator(mark);
@@ -129,6 +122,10 @@ define(["esri/map",
       }
       dataCache[layerName] = dataCache[layerName].concat(data);
     }
+  }
+  
+  function clearPoints(layerName) {
+    allLayers[layerName].clear();
   }
 
   function addGraphicLayer(name) {
@@ -188,7 +185,8 @@ define(["esri/map",
         },
         "map": map,
         "domNodeId": "heatLayer",
-        "opacity": 0.8
+        "opacity": 0.8,
+    "className": "heatmap"
       });
       layer.setData(heatData);
       map.addLayer(layer);
@@ -212,16 +210,27 @@ define(["esri/map",
     allLayers[name].show();
   }
 
+  function clearLayers() {
+    for (var name in allLayers) {
+    if (allLayers[name].className=="heatmap") {
+      map.removeLayer(allLayers[name])
+    }
+    else allLayers[name].clear();
+  }
+  }
+
   return {
     map: map,
     addPoint: addPoint,
     addPoints: addPoints,
+  clearPoints: clearPoints,
     addGraphicLayer: addGraphicLayer,
     addClusterLayer: addClusterLayer,
     addHeatmapLayer: addHeatmapLayer,
     hideLayer: hideLayer,
     showLayer: showLayer,
-    switchBaseMap: switchBaseMap
+    switchBaseMap: switchBaseMap,
+  clearLayers: clearLayers
   };
 
 });
