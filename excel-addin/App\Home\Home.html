@@ -24,18 +24,21 @@
     
     <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css">
     <script src="https://js.arcgis.com/3.15/"></script>
-    <script src="Home.js" type="text/javascript"></script>
+    <script src="Home.js" type="text/javascript"></script> 
 </head>
 <body>
     <div id="content-main">
         <div class="padding">
             <h1>Welcome</h1>
             <p>This example will read the current document selection.</p>
+            <button id="base">base</button>
             <button id="generate-data">generate data</button>
-            <button id="show-data-from-selection">show data</button>
+            <button id="show-data">show data</button>
             <button id="cluster">cluster</button>
+            <button id="heatmap">heatmap</button>
             <button id="enrich">Enrich</button>
             <div id="layer-toggles"></div>
+            <div id="heatLayer"></div>
             <div id="map"></div>
             <p style="margin-top: 30px;">
                 <a target="_blank" href="https://go.microsoft.com/fwlink/?LinkId=276813">Find more samples online...</a>

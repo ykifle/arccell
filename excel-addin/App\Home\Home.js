@@ -54,6 +54,20 @@
 						}
 					});
 				}
+					
+					function handleBaseClick() {
+						drawer.switchBaseMap()
+					}
+					
+					function handleClusterClick() {
+						if (drawer.addClusterLayer("clusterPoints"))
+						  addLayerToggle("clusterPoints");
+					}
+					
+					function handleHeatmapClick() {
+						if (drawer.addHeatmapLayer("heatmapPoints"))
+						  addLayerToggle("heatmapPoints");
+					}
 
 				function showRandomData(layerName) {
 					getSelectedRowsCount(function(count) {
@@ -82,16 +96,27 @@
 						}
 						arcApi.getGeoEnrichmentData(points, function(data) {
 							console.log('got data');
-							debugger;
 							if ('messages' in data && data.messages.length) {
-								console.log(data['messages']);
+								console.log(JSON.stringify(data['messages']));
+							}
+							if (data.results[0].value.FeatureSet.length === 0) {
+								console.log('No features found');
 								return;
 							}
 							var features = data.results[0].value.FeatureSet[0].features;
 							var rows = [];
-							for (var i=0; i<features.length; i++) {
-								var attributes = features[i].attributes;
-								rows.push([points[i].long, points[i].lat, attributes.TOTPOP]);
+							for (var i=0; i<points.length; i++) {
+								var row = [points[i].long, points[i].lat];
+								for (var j=0; j < features.length; j++) {
+									var attributes = features[j].attributes;
+									if (attributes.OBJECTID === i) {
+										row.push(attributes.TOTPOP);
+									}
+								}
+								if (row.length == 2) {
+									row.push('NA');
+								}
+								rows.push(row);
 							}
 							Office.context.document.setSelectedDataAsync(rows);
 						});
@@ -154,13 +179,14 @@
 					return (Math.random() * 360 - 180).toFixed(3) * 1;
 				}
 
-				$('#show-data-from-selection').click(showDataFromSelection);
-				$('#generate-data').click(function() {
-					showRandomData('clickPoints');
-				});
-				$('#cluster').click(handleClusterClick);
-				$('#testapi').click(handleGeoEnrichClick);
-			});
+					$('#base').click(handleBaseClick);
+					$('#show-data').click(function(){showDataFromSelection('clickPoints')});
+					$('#generate-data').click(function() { showRandomData('clickPoints'); });
+					$('#cluster').click(handleClusterClick);
+					$('#heatmap').click(handleHeatmapClick);
+					$('#enrich').click(handleGeoEnrichClick);
+			  }
+			);
 		});
 	};
 })();
