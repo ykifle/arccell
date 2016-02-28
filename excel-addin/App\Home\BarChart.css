@@ -4,6 +4,10 @@
 }
 
 .bar:hover {
+  fill: lightblue;
+}
+
+.active_bar {
   fill: brown;
 }
 

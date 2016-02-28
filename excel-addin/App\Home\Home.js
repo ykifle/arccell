@@ -8,8 +8,12 @@
 		$(document).ready(function() {
 			app.initialize();
 			require(["arccell/BarChart", "arccell/MapDrawer", "arccell/ArcGisApi", "dojo/_base/array", "dojo/domReady!"], function(chart, drawer, arcApi, array) {
+				
 				drawer.addGraphicLayer('clickPoints');
 				addLayerToggle('clickPoints');
+				drawer.addGraphicLayer('chartPoints');
+				addLayerToggle('chartPoints');
+				
 				drawer.map.on("click", doClick);
 
 				function doClick(event) {
@@ -141,7 +145,7 @@
 
                                   function plotData() {
 									 getDataFromSelection(function(result) {
-										var data = chart.count_within_map_bounds(result.value);
+										var data = chart.count(result.value);
                                      	chart.chart(data);
 									 });
                                   }
