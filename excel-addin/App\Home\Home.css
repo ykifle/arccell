@@ -5,6 +5,10 @@
     top: 14px;
 }
 
+#layer-toggles {
+  padding: 19px 2px;
+}
+
 .dataBrowserPopup {
   width: 500px;
     height: 500px;

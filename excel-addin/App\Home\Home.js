@@ -304,6 +304,9 @@
 							});
 							var data = chart.count(gc);
 							chart.chart(data);
+							$('#clickPoints-layer-toggle').removeAttr('checked').trigger("change");
+							$('#clusterPoints-layer-toggle').removeAttr('checked').trigger("change");
+							$('#heatmapPoints-layer-toggle').removeAttr('checked').trigger("change");
 						} else if (result.value[0].length == 3) {
 							var data = chart.count(result.value);
 							if (!drawer.hasLayer('chartPoints')) {
@@ -311,6 +314,9 @@
 								addLayerToggle('chartPoints');
 							}
 							chart.chart(data);
+							$('#clickPoints-layer-toggle').removeAttr('checked').trigger("change");
+							$('#clusterPoints-layer-toggle').removeAttr('checked').trigger("change");
+							$('#heatmapPoints-layer-toggle').removeAttr('checked').trigger("change");
 						} else {
 							app.showNotification('Error:', 'Select 2 or 3 columns to chart.');
 						}
