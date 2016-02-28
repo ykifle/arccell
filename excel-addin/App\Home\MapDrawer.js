@@ -185,7 +185,8 @@ define(["esri/map",
         },
         "map": map,
         "domNodeId": "heatLayer",
-        "opacity": 0.8
+        "opacity": 0.8,
+    "className": "heatmap"
       });
       layer.setData(heatData);
       map.addLayer(layer);
@@ -209,8 +210,13 @@ define(["esri/map",
     allLayers[name].show();
   }
 
-  function clear() {
-    allLayers[name].show();
+  function clearLayers() {
+    for (var name in allLayers) {
+    if (allLayers[name].className=="heatmap") {
+      map.removeLayer(allLayers[name])
+    }
+    else allLayers[name].clear();
+  }
   }
 
   return {
@@ -223,7 +229,8 @@ define(["esri/map",
     addHeatmapLayer: addHeatmapLayer,
     hideLayer: hideLayer,
     showLayer: showLayer,
-    switchBaseMap: switchBaseMap
+    switchBaseMap: switchBaseMap,
+  clearLayers: clearLayers
   };
 
 });

@@ -123,6 +123,9 @@
 						});
 					});
 				}
+				function handleClearClick() {
+					drawer.clearLayers();
+				}
 				
 				/******* Excel Sheet Manipulation Methods *******/
 
@@ -216,8 +219,9 @@
 					$('#generate-data').click(function() { showRandomData('clickPoints'); });
 					$('#cluster').click(handleClusterClick);
 					$('#heatmap').click(handleHeatmapClick);
-                                        $('#make-chart').click(plotData);
+                    $('#make-chart').click(plotData);
 					$('#enrich').click(handleGeoEnrichClick);
+					$('#clear').click(handleClearClick);
 			  }
 			);
 		});
