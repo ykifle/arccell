@@ -133,7 +133,7 @@ define(["esri/map",
   }
   
   function clearPoints(layerName) {
-	  allLayers[layerName].clear();
+    allLayers[layerName].clear();
   }
 
   function addGraphicLayer(name) {
@@ -225,7 +225,7 @@ define(["esri/map",
     map: map,
     addPoint: addPoint,
     addPoints: addPoints,
-	clearPoints: clearPoints,
+  clearPoints: clearPoints,
     addGraphicLayer: addGraphicLayer,
     addClusterLayer: addClusterLayer,
     addHeatmapLayer: addHeatmapLayer,
