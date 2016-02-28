@@ -78,7 +78,7 @@
 							return [p.long, p.lat];
 						});
 						drawer.addPoints(randomPoints, layerName);
-						Office.context.document.setSelectedDataAsync(excelRows);
+						setSelectedDataAsync(excelRows);
 					});
 				}
 				
@@ -115,7 +115,7 @@
 								}
 								rows.push(row);
 							}
-							Office.context.document.setSelectedDataAsync(rows);
+							setSelectedDataAsync(rows);
 						});
 					});
 				}
@@ -152,9 +152,20 @@
 						if (!('error' in json)) {
 							addr = json.address.Match_addr;
 						}
-						Office.context.document.setSelectedDataAsync([
+						setSelectedDataAsync([
 							[point.x, point.y, addr]
 						]);
+					});
+				}
+				
+				function setSelectedDataAsync(data, options) {
+					options = options || {};
+					Office.context.document.setSelectedDataAsync(data, options, function (asyncResult) {
+					    if (asyncResult.status == "failed") {
+					      console.log("Action failed with error: " + asyncResult.error.message);
+					    } else {
+					      console.log("Table successfully written. Click next to move on.");
+					    }
 					});
 				}
 
