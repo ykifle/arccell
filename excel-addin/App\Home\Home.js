@@ -60,13 +60,15 @@
 					}
 					
 					function handleClusterClick() {
-						if (drawer.addClusterLayer("clusterPoints"))
+						if (drawer.addClusterLayer("clusterPoints")) {
 						  addLayerToggle("clusterPoints");
+						}
 					}
 					
 					function handleHeatmapClick() {
-						if (drawer.addHeatmapLayer("heatmapPoints"))
+						if (drawer.addHeatmapLayer("heatmapPoints")) {
 						  addLayerToggle("heatmapPoints");
+						}
 					}
 
 				function showRandomData(layerName) {
@@ -78,11 +80,6 @@
 						drawer.addPoints(randomPoints, layerName);
 						Office.context.document.setSelectedDataAsync(excelRows);
 					});
-				}
-
-				function handleClusterClick() {
-					drawer.addClusterLayer("clusterPoints");
-					addLayerToggle("clusterPoints");
 				}
 				
 				function handleGeoEnrichClick() {
