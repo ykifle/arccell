@@ -6,9 +6,9 @@ A fusion of ArgGIS capabilities with the power of Microsoft Office 365 Excel
 
 ##Features
 * Visualize your Excel data on a Esri map
-* Enter your data as lat/long points or as addresses, using Esri's geocoding service
+* Search for places or addresses using Esri's Geocoding service
 * Analyze your data with heatmaps and clustering
-* Enrich your data using Esri GeoEnrichment Data Browser
+* Enrich your data using Esri's GeoEnrichment Data Browser
 * Integrate geospatial and non-geospatial data using interactive charts
 
 ##Demo Flow
