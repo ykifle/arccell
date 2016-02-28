@@ -86,6 +86,7 @@ function chart(data) {
     .on("click", function(d) { doClick(d[0]) });
     
   var pointData = all_data.map( function(d) { return {long: d[0], lat: d[1]}; } );
+  drawer.clearPoints("chartPoints");
   drawer.addPoints(pointData, "chartPoints");
 };
 
@@ -95,6 +96,8 @@ function chart(data) {
 // raw_data[n][2]=enum
 //output is an array that can be fed to chart(data)
 function count(raw_data) {
+	all_data = [];
+	group_data = {};
   var output = {};
   raw_data.map(
     function(d) {

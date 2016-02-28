@@ -16,6 +16,7 @@ define(["esri/map",
         "esri/symbols/PictureMarkerSymbol",
         "esri/renderers/ClassBreaksRenderer",
         "esri/geometry/webMercatorUtils",
+        "arccell/ArcGisApi",
         "arccell/Heatmap",
         "dojo/domReady!",
         "esri/geometry"], function(Map,
@@ -35,7 +36,8 @@ define(["esri/map",
                                    HeatmapLayer,
                                    PictureMarkerSymbol,
                                    ClassBreaksRenderer,
-                                   webMercatorUtils) {
+                                   webMercatorUtils,
+                                   arcApi) {
 
   var map = new Map("map", {
     basemap: "topo",
@@ -82,17 +84,7 @@ define(["esri/map",
       mark = new Point(pointData.long, pointData.lat);
     } else {
       //if it's not a lat/long, do geocoding
-    var addr = pointData.long.split('\n').slice(0,2).join()
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text=" + encodeURIComponent(addr), false);
-      xhr.send();
-      if (xhr.status == 200) {
-        var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
-        mark = new Point(geom.x, geom.y);
-      } else {
-        app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
-        return;
-      }
+      mark = arcApi.geocode(pointData.long);
     }
 
     var webMercator = webMercatorUtils.geographicToWebMercator(mark);

@@ -145,8 +145,20 @@
 
                                   function plotData() {
 									 getDataFromSelection(function(result) {
-										var data = chart.count(result.value);
-                                     	chart.chart(data);
+										if (result.value[0].length == 2) {
+											var gc = result.value.map(
+												function(d) {
+													var p = arcApi.geocode(d[0]);
+													return [p.x, p.y, d[1]];
+												});
+											var data = chart.count(gc);
+											chart.chart(data);
+										} else if (result.value[0].length == 3) {
+											var data = chart.count(result.value);
+											chart.chart(data);
+										} else {
+											app.showNotification('Error:', 'Select 2 or 3 columns to chart.');
+										}
 									 });
                                   }
 

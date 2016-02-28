@@ -1,7 +1,8 @@
-define(["esri/request",
+define(["esri/geometry/Point",
+"esri/request",
     "esri/IdentityManager",
     "esri/ServerInfo",
-    "dojo/_base/array"], function(esriRequest, esriId, ServerInfo, arrays) {
+    "dojo/_base/array"], function(Point, esriRequest, esriId, ServerInfo, arrays) {
 
   var apiKey;
   var keyExpires;
@@ -10,6 +11,20 @@ define(["esri/request",
   var tokenUrl = 'https://www.arcgis.com/sharing/generateToken';
   var tokenServer = new ServerInfo();
   tokenServer.tokenServiceUrl = tokenUrl;
+
+  function geocode(str) {
+	var addr = str.split('\n').slice(0,2).join()
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text=" + encodeURIComponent(addr), false);
+    xhr.send();
+    if (xhr.status == 200) {
+      var geom = JSON.parse(xhr.response).locations[0].feature.geometry;
+      return new Point(geom.x, geom.y);
+    } else {
+      app.showNotification('Error:', 'Unable to connect to ESRI Geocode Server.');
+      return;
+    }
+  }
 
   function getGeoEnrichmentData(points, callback) {
     var url = 'https://geoenrich.arcgis.com/arcgis/rest/services/World/GeoenrichmentServer/Geoenrichment/enrich';
@@ -73,7 +88,8 @@ define(["esri/request",
 
   return {
     call: call,
-    getGeoEnrichmentData: getGeoEnrichmentData
+    getGeoEnrichmentData: getGeoEnrichmentData,
+	geocode: geocode
   };
 
 });
