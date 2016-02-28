@@ -131,6 +131,10 @@ define(["esri/map",
       dataCache[layerName] = dataCache[layerName].concat(data);
     }
   }
+  
+  function clearPoints(layerName) {
+	  allLayers[layerName].clear();
+  }
 
   function addGraphicLayer(name) {
     var layer = new GraphicsLayer();
@@ -221,6 +225,7 @@ define(["esri/map",
     map: map,
     addPoint: addPoint,
     addPoints: addPoints,
+	clearPoints: clearPoints,
     addGraphicLayer: addGraphicLayer,
     addClusterLayer: addClusterLayer,
     addHeatmapLayer: addHeatmapLayer,
