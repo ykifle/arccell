@@ -217,6 +217,10 @@ define(["esri/map",
     allLayers[name].show();
   }
 
+  function clear() {
+    allLayers[name].show();
+  }
+
   return {
     map: map,
     addPoint: addPoint,
