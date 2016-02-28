@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8" />
@@ -11,9 +11,9 @@
 
     <link href="../App.css" rel="stylesheet" type="text/css" />
     <script src="../App.js" type="text/javascript"></script>
-    
+
     <link href="Home.css" rel="stylesheet" type="text/css" />
-    <script>var dojoConfig = { 
+    <script>var dojoConfig = {
       locale: "en",
       packages: [
       {
@@ -21,10 +21,13 @@
         location: location.pathname.replace(/\/[^/]+$/, "")
       }]
     };</script>
-    
+
     <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css">
     <script src="https://js.arcgis.com/3.15/"></script>
-    <script src="Home.js" type="text/javascript"></script> 
+    <link rel="stylesheet" href="BarChart.css">
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+
+    <script src="Home.js" type="text/javascript"></script>
 </head>
 <body>
     <div id="content-main">
@@ -36,12 +39,11 @@
             <button id="show-data">show data</button>
             <button id="cluster">cluster</button>
             <button id="heatmap">heatmap</button>
+            <button id="make-chart">make chart</button>
             <div id="layer-toggles"></div>
             <div id="heatLayer"></div>
             <div id="map"></div>
-            <p style="margin-top: 30px;">
-                <a target="_blank" href="https://go.microsoft.com/fwlink/?LinkId=276813">Find more samples online...</a>
-            </p>
+            <div id="chart"></div>
         </div>
     </div>
 </body>

@@ -8,10 +8,11 @@
 		$(document).ready(function() {
 			app.initialize();
 			require([
+		      "arccell/BarChart",
 			  "arccell/MapDrawer",
 			  "dojo/_base/array",
 			  "dojo/domReady!"],
-			  function(drawer, array) {
+			  function(chart, drawer, array) {
 				drawer.addGraphicLayer('clickPoints');
 				addLayerToggle('clickPoints');
 			    drawer.map.on("click", doClick);
@@ -109,6 +110,13 @@
 						});
 				  }
 
+                                  function plotData() {
+									 getDataFromSelection(function(result) {
+										var data = chart.count_within_map_bounds(result.value);
+                                     	chart.chart(data);
+									 });
+                                  }
+
 				  /******* Helpers *******/
 
 				  function generateRandomGeoList(count) {
@@ -132,6 +140,7 @@
 					$('#generate-data').click(function() { showRandomData('clickPoints'); });
 					$('#cluster').click(handleClusterClick);
 					$('#heatmap').click(handleHeatmapClick);
+                                        $('#make-chart').click(plotData);
 			  }
 			);
 		});
