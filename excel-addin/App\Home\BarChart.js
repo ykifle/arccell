@@ -1,4 +1,4 @@
-define(["arccell/MapDrawer"],function(drawer) {
+define(["arccell/MapDrawer", "d3/d3.v3.min"],function(drawer, d3) {
 
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = drawer.map.width - margin.left - margin.right,
@@ -61,33 +61,33 @@ function chart(data) {
 // raw_data[n][2]=enum
 //output is an array that can be fed to chart(data)
 function count_within_map_bounds(raw_data) {
-	var ext = drawer.map.geographicExtent;
-	var output = {};
-	raw_data.map(
-		function(d) {
-			var lat = d[0];
-			var long = d[1];
-			//if (lat <= ext.xmax && lat >= ext.xmin &&
-			//    long <= ext.ymax && long >= ext.ymin) {
-					if (output.hasOwnProperty(d[2])) {
-						output[d[2]]++;
-					} else {
-						output[d[2]] = 1;
-					}
-			//	}
-		});
-	var array = [];
-	for (var prop in output) {
-		if (output.hasOwnProperty(prop)) {
-			array.push([prop,output[prop]]);
-		}	
-	}
-	return array;
+  var ext = drawer.map.geographicExtent;
+  var output = {};
+  raw_data.map(
+    function(d) {
+      var lat = d[0];
+      var long = d[1];
+      //if (lat <= ext.xmax && lat >= ext.xmin &&
+      //    long <= ext.ymax && long >= ext.ymin) {
+          if (output.hasOwnProperty(d[2])) {
+            output[d[2]]++;
+          } else {
+            output[d[2]] = 1;
+          }
+      //  }
+    });
+  var array = [];
+  for (var prop in output) {
+    if (output.hasOwnProperty(prop)) {
+      array.push([prop,output[prop]]);
+    } 
+  }
+  return array;
 }
 
 return {
     chart: chart,
-	count_within_map_bounds: count_within_map_bounds
+  count_within_map_bounds: count_within_map_bounds
 };
 
 });

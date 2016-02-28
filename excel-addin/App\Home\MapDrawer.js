@@ -165,8 +165,8 @@ define(["esri/map",
     var green = new PictureMarkerSymbol(picBaseUrl + "GreenPin1LargeB.png", 64, 64).setOffset(0, 15);
     var red = new PictureMarkerSymbol(picBaseUrl + "RedPin1LargeB.png", 72, 72).setOffset(0, 15);
     renderer.addBreak(0, 1, blue);
-    renderer.addBreak(1, 5, green);
-    renderer.addBreak(5, 1001, red);
+    renderer.addBreak(1, 10, green);
+    renderer.addBreak(10, 1001, red);
     layer.setRenderer(renderer);
     map.addLayer(layer);
     allLayers[name] = layer;
