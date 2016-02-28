@@ -1,4 +1,4 @@
-define(["arccell/MapDrawer", "d3/d3.v3.min"],function(drawer, d3) {
+﻿define(["arccell/MapDrawer", "d3/d3.v3.min"],function(drawer, d3) {
 
 var activeBar = null;
 

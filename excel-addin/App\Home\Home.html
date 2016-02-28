@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8" />
@@ -29,6 +29,8 @@
     <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css">
     <link rel="stylesheet" href="https://js.arcgis.com/3.15/dijit/themes/claro/claro.css">
     <link rel="stylesheet" href="https://js.arcgis.com/3.15/dgrid/css/dgrid.css">
+	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="https://js.arcgis.com/3.15/"></script>
     <link rel="stylesheet" href="BarChart.css">
 
@@ -40,14 +42,29 @@
             <h1>Arccell</h1>
             <p>The perfect marriage between ArcGIS and Excel.</p>
             <button id="base">Base</button>
-            <button id="generate-data">Generate Data</button>
-            <button id="show-data">Show Data</button>
-            <button id="cluster">Cluster</button>
-            <button id="heatmap">Heatmap</button>
-            <button id="enrich">Enrich</button>
-            <button id="make-chart">Chart</button>
-            <button id="clear">Clear</button>
-            <label for="highlight-selection">Highlight Selection<input type="checkbox" id="highlight-selection" value="highlight-selection"></label>
+            <!--<button id="generate-data">Generate Data</button>-->
+			<button class="btn btn-default btn-sm" id="show-data">
+  				<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Show Data
+			</button>
+            <button class="btn btn-default btn-sm" id="show-data">
+				<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Show Data
+			</button>
+            <button class="btn btn-default btn-sm" id="cluster">
+				<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Cluster
+			</button>
+            <button class="btn btn-default btn-sm" id="heatmap">
+				<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Heatmap
+			</button>
+            <button class="btn btn-default btn-sm" id="enrich">
+				<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Enrich
+			</button>
+            <button class="btn btn-default btn-sm" id="make-chart">
+				<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Chart
+			</button>
+            <button class="btn btn-default btn-sm" id="clear">
+				<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Clear
+			</button>
+            <!--<label for="highlight-selection">Highlight Selection<input type="checkbox" id="highlight-selection" value="highlight-selection"></label>-->
             <div id="layer-toggles">
                 <h4>Layer Toggles</h4>
             </div>

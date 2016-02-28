@@ -1,4 +1,4 @@
-define(["esri/map",
+﻿define(["esri/map",
         "esri/geometry/Geometry",
         "esri/geometry/Point",
         "esri/geometry/Polyline",
@@ -41,7 +41,7 @@ define(["esri/map",
 
   var map = new Map("map", {
     basemap: "topo",
-    center: [-106.61, 35.1107],
+    center: [-80.61, 40.1107],
     zoom: 5
   });
   var mapLoaded = false;
@@ -197,6 +197,10 @@ define(["esri/map",
       return false;
     }
   }
+  
+  function hasLayer(name) {
+	  return name in allLayers;
+  }
 
   function refreshHeatmapLayer(name) {
     allLayers[name].setData(heatData);
@@ -223,14 +227,15 @@ define(["esri/map",
     map: map,
     addPoint: addPoint,
     addPoints: addPoints,
-  clearPoints: clearPoints,
+	clearPoints: clearPoints,
     addGraphicLayer: addGraphicLayer,
     addClusterLayer: addClusterLayer,
     addHeatmapLayer: addHeatmapLayer,
     hideLayer: hideLayer,
     showLayer: showLayer,
     switchBaseMap: switchBaseMap,
-  clearLayers: clearLayers
+    clearLayers: clearLayers,
+	hasLayer: hasLayer
   };
 
 });

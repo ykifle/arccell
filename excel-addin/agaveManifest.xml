@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--Created:cbbc9d22-5cf7-4e4c-8ee9-42a772aae58a-->
 <OfficeApp xsi:type="ContentApp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/office/appforoffice/1.0">
-  <Id>{b3a45b39-2452-4519-ad18-3148427904f3}</Id>
+  <Id>{62a011e6-8bcc-41b0-bc0c-dcefde47f837}</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>Fei Xue</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
