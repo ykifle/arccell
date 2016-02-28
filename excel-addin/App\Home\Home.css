@@ -1,4 +1,10 @@
 ﻿/* Page-specific styling */
+#tool-title {
+    position: absolute;
+    right: 12px;
+    top: 14px;
+}
+
 .dataBrowserPopup {
   width: 500px;
     height: 500px;

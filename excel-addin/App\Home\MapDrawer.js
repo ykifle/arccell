@@ -199,7 +199,7 @@
   }
   
   function hasLayer(name) {
-	  return name in allLayers;
+    return name in allLayers;
   }
 
   function refreshHeatmapLayer(name) {
@@ -227,7 +227,7 @@
     map: map,
     addPoint: addPoint,
     addPoints: addPoints,
-	clearPoints: clearPoints,
+  clearPoints: clearPoints,
     addGraphicLayer: addGraphicLayer,
     addClusterLayer: addClusterLayer,
     addHeatmapLayer: addHeatmapLayer,
@@ -235,7 +235,7 @@
     showLayer: showLayer,
     switchBaseMap: switchBaseMap,
     clearLayers: clearLayers,
-	hasLayer: hasLayer
+  hasLayer: hasLayer
   };
 
 });

@@ -96,8 +96,8 @@ function chart(data) {
 // raw_data[n][2]=enum
 //output is an array that can be fed to chart(data)
 function count(raw_data) {
-	all_data = [];
-	group_data = {};
+  all_data = [];
+  group_data = {};
   var output = {};
   raw_data.map(
     function(d) {
