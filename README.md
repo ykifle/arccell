@@ -9,7 +9,7 @@ A fusion of ArgGIS capabilities with the power of Microsoft Office 365 Excel
 * Enter your data as lat/long points or as addresses, using Esri's geocoding service
 * Analyze your data with heatmaps and clustering
 * Enrich your data using Esri GeoEnrichment Data Browser
-* Interactive charts demonstrate the integration of geospatial and non-geospatial data
+* Integrate geospatial and non-geospatial data using interactive charts
 
 ##Demo Flow
 1. Load real world real estate data
