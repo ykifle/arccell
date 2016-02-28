@@ -1,1 +1,15 @@
 ﻿/* Page-specific styling */
+.dataBrowserPopup {
+  width: 500px;
+    height: 500px;
+    position: absolute;
+    top: 36px;
+    background: whitesmoke;
+    z-index: 99;
+    left: 36px;
+  display: none;
+}
+
+.dataBrowserPopup.open {
+  display: block;
+}

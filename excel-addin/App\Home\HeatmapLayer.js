@@ -1,11 +1,11 @@
 ﻿define(["dojo/_base/declare","esri/layers/DynamicMapServiceLayer" ], function (declare,DynamicMapServiceLayer) {
     return declare("HeatmapLayer", [DynamicMapServiceLayer], {
         /*
-	{
-		map: <a handle to the map>,
-		domNodeId: <an id to the domNode>,
-	}
-	*/
+    {
+        map: <a handle to the map>,
+        domNodeId: <an id to the domNode>,
+    }
+    */
         // variables
         properties: {},
         heatMap: null,

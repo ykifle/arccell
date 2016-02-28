@@ -11,7 +11,7 @@ define(["esri/request",
   var tokenServer = new ServerInfo();
   tokenServer.tokenServiceUrl = tokenUrl;
 
-  function getGeoEnrichmentData(points, callback) {
+  function getGeoEnrichmentData(points, options, callback) {
     var url = 'https://geoenrich.arcgis.com/arcgis/rest/services/World/GeoenrichmentServer/Geoenrichment/enrich';
     var args = {
       f: 'json',
@@ -24,6 +24,7 @@ define(["esri/request",
         };
       }))
     };
+  $.extend(args, options);
     call(url, args, { usePost: true }, callback);
   }
 
@@ -50,6 +51,18 @@ define(["esri/request",
       _callInternal(url, args, options, callback);
     }
   }
+  
+  function login(callback) {
+    if (!apiKey || !keyExpires || Date.now() - 1000 > keyExpires) {
+    refreshApiKey(function() {
+      callback();
+      }, function() {
+        console.log('Failed to login');
+      });
+    } else {
+      callback();
+    }
+  }
 
   function refreshApiKey(success, failure) {
     esriId.generateToken(tokenServer, {
@@ -73,6 +86,7 @@ define(["esri/request",
 
   return {
     call: call,
+  login: login,
     getGeoEnrichmentData: getGeoEnrichmentData
   };
 

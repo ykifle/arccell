@@ -7,7 +7,8 @@
 	Office.initialize = function(reason) {
 		$(document).ready(function() {
 			app.initialize();
-			require(["arccell/MapDrawer", "arccell/ArcGisApi", "dojo/_base/array", "dojo/domReady!"], function(drawer, arcApi, array) {
+			require(["arccell/MapDrawer", "arccell/ArcGisApi", "esri/dijit/geoenrichment/DataBrowser", "dojo/_base/array", "dijit/popup", "dojo/domReady!"], 
+			function(drawer, arcApi, DataBrowser, array, popup) {
 				drawer.addGraphicLayer('clickPoints');
 				addLayerToggle('clickPoints');
 				drawer.map.on("click", doClick);
@@ -41,6 +42,36 @@
 					});
 				}
 
+				function handleHightlightSelectionChange() {
+					if ($(this).is(":checked")) {
+						Office.context.document.addHandlerAsync(
+							Office.EventType.DocumentSelectionChanged, documentSelectionChangedHandler, function(asyncResult) {
+							if (asyncResult.status == "failed") {
+								console.log("Action failed with error: " + asyncResult.error.message);
+							} else {
+								console.log("DocumentSelectionChanged handler added successfully." + " Click Next to learn how to remove it.");
+							}
+						});
+					} else {
+						Office.context.document.removeHandlerAsync(
+						  Office.EventType.DocumentSelectionChanged,
+						  {handler: documentSelectionChangedHandler},
+						  function (asyncResult) {
+						    if (asyncResult.status == "failed") {
+						      console.log("Action failed with error: " + asyncResult.error.message);
+						    } else {
+						      console.log("DocumentSelectionChanged handler remove succeeded");
+						    }
+						});
+					}
+				}
+				
+				function documentSelectionChangedHandler(args) {
+					getDataFromSelection(function (asyncResult) {
+						console.log("DocumentSelectionChanged: " + asyncResult.value);
+				    });
+				}
+
 				// Reads data from current document selection and displays a notification
 				function showDataFromSelection(layerName) {
 					getDataFromSelection(function(result) {
@@ -54,22 +85,22 @@
 						}
 					});
 				}
-					
-					function handleBaseClick() {
-						drawer.switchBaseMap()
+
+				function handleBaseClick() {
+					drawer.switchBaseMap()
+				}
+
+				function handleClusterClick() {
+					if (drawer.addClusterLayer("clusterPoints")) {
+						addLayerToggle("clusterPoints");
 					}
-					
-					function handleClusterClick() {
-						if (drawer.addClusterLayer("clusterPoints")) {
-						  addLayerToggle("clusterPoints");
-						}
+				}
+
+				function handleHeatmapClick() {
+					if (drawer.addHeatmapLayer("heatmapPoints")) {
+						addLayerToggle("heatmapPoints");
 					}
-					
-					function handleHeatmapClick() {
-						if (drawer.addHeatmapLayer("heatmapPoints")) {
-						  addLayerToggle("heatmapPoints");
-						}
-					}
+				}
 
 				function showRandomData(layerName) {
 					getSelectedRowsCount(function(count) {
@@ -81,7 +112,7 @@
 						setSelectedDataAsync(excelRows);
 					});
 				}
-				
+
 				function handleGeoEnrichClick() {
 					getDataFromSelection(function(result) {
 						var points = [];
@@ -91,40 +122,80 @@
 								lat: result.value[idx][1]
 							});
 						}
-						arcApi.getGeoEnrichmentData(points, function(data) {
-							console.log('got data');
-							if ('messages' in data && data.messages.length) {
-								console.log(JSON.stringify(data['messages']));
-							}
-							if (data.results[0].value.FeatureSet.length === 0) {
-								console.log('No features found');
-								return;
-							}
-							var features = data.results[0].value.FeatureSet[0].features;
-							var rows = [];
-							for (var i=0; i<points.length; i++) {
-								var row = [points[i].long, points[i].lat];
-								for (var j=0; j < features.length; j++) {
-									var attributes = features[j].attributes;
-									if (attributes.OBJECTID === i) {
-										row.push(attributes.TOTPOP);
+						if ($('#dataBrowser').length === 0) {
+							$('<div />', { id: 'dataBrowser' }).appendTo($('.dataBrowserPopup'))
+						}
+						var dataBrowser = new DataBrowser({
+		                    countryID: "US",
+		                    selectionLimit: 1,
+						    okButton: "Yes",
+						    backButton: "Back",
+						    cancelButton: "No",
+						    onSelect: function() {
+						        console.log("Selected variables: " + dataBrowser.get("selection"));
+						    },
+						    onOK: function() {
+								var selectedVariables = dataBrowser.get("selection");
+								$('.dataBrowserPopup').removeClass('open');
+								dataBrowser.destroy();
+						        console.log("OK clicked");
+								if (selectedVariables.length === 0) {
+									return;
+								}
+								arcApi.getGeoEnrichmentData(points, {
+										analysisVariables: selectedVariables
+									}, function(data) {
+									console.log('got data');
+									if ('messages' in data && data.messages.length) {
+										console.log(JSON.stringify(data['messages']));
 									}
-								}
-								if (row.length == 2) {
-									row.push('NA');
-								}
-								rows.push(row);
-							}
-							setSelectedDataAsync(rows);
+									if (data.results[0].value.FeatureSet.length === 0) {
+										console.log('No features found');
+										return;
+									}
+									var features = data.results[0].value.FeatureSet[0].features;
+									var rows = [];
+									for (var i = 0; i < points.length; i++) {
+										var row = [points[i].long, points[i].lat];
+										for (var j = 0; j < features.length; j++) {
+											var attributes = features[j].attributes;
+											if (attributes.OBJECTID === i) {
+												row.push(attributes[selectedVariables[0].split('.')[1]]);
+											}
+										}
+										if (row.length == 2) {
+											row.push('NA');
+										}
+										rows.push(row);
+									}
+									setSelectedDataAsync(rows);
+								});
+						    },          
+						    onCancel: function() {
+								$('.dataBrowserPopup').removeClass('open');
+								dataBrowser.destroy();
+						        console.log("Cancel clicked");
+						    },          
+						    onBack: function() {
+						        console.log("Back clicked");
+						    }
+		                }, "dataBrowser");
+						arcApi.login(function() {
+							$('.dataBrowserPopup').addClass('open');
+							dataBrowser.startup();
 						});
 					});
 				}
 
 				/******* Excel Sheet Manipulation Methods *******/
 
-				function getDataFromSelection(callback) {
+				function getDataFromSelection(coercionType, callback) {
+					if (typeof coercionType == 'function' && !callback) {
+						callback = coercionType;
+						coercionType = Office.CoercionType.Matrix;
+					}
 					if (Office.context.document.getSelectedDataAsync) {
-						Office.context.document.getSelectedDataAsync(Office.CoercionType.Matrix, function(result) {
+						Office.context.document.getSelectedDataAsync(coercionType, function(result) {
 							if (result.status === Office.AsyncResultStatus.Succeeded) {
 								if (callback) {
 									callback(result);
@@ -157,15 +228,15 @@
 						]);
 					});
 				}
-				
+
 				function setSelectedDataAsync(data, options) {
 					options = options || {};
-					Office.context.document.setSelectedDataAsync(data, options, function (asyncResult) {
-					    if (asyncResult.status == "failed") {
-					      console.log("Action failed with error: " + asyncResult.error.message);
-					    } else {
-					      console.log("Table successfully written. Click next to move on.");
-					    }
+					Office.context.document.setSelectedDataAsync(data, options, function(asyncResult) {
+						if (asyncResult.status == "failed") {
+							console.log("Action failed with error: " + asyncResult.error.message);
+						} else {
+							console.log("Table successfully written. Click next to move on.");
+						}
 					});
 				}
 
@@ -187,14 +258,18 @@
 					return (Math.random() * 360 - 180).toFixed(3) * 1;
 				}
 
-					$('#base').click(handleBaseClick);
-					$('#show-data').click(function(){showDataFromSelection('clickPoints')});
-					$('#generate-data').click(function() { showRandomData('clickPoints'); });
-					$('#cluster').click(handleClusterClick);
-					$('#heatmap').click(handleHeatmapClick);
-					$('#enrich').click(handleGeoEnrichClick);
-			  }
-			);
+				$('#base').click(handleBaseClick);
+				$('#show-data').click(function() {
+					showDataFromSelection('clickPoints')
+				});
+				$('#generate-data').click(function() {
+					showRandomData('clickPoints');
+				});
+				$('#cluster').click(handleClusterClick);
+				$('#heatmap').click(handleHeatmapClick);
+				$('#enrich').click(handleGeoEnrichClick);
+				$('#highlight-selection').change(handleHightlightSelectionChange);
+			});
 		});
 	};
 })();
