@@ -50,8 +50,8 @@
 								long: result.value[idx][0],
 								lat: result.value[idx][1]
 							});
-							drawer.addPoints(points, layerName);
 						}
+						drawer.addPoints(points, layerName);
 					});
 				}
 					
@@ -119,7 +119,7 @@
 						});
 					});
 				}
-
+				
 				/******* Excel Sheet Manipulation Methods *******/
 
 				function getDataFromSelection(callback) {
